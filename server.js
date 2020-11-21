@@ -10,7 +10,7 @@ app.prepare().then(() => {
   const server = express()
 
   //Express middleware in error:
-  server.use('/favorites', (req, res, nextFunction) => {
+  server.use('/favorites/a', (req, res, nextFunction) => {
     nextFunction(500);
   })
 
