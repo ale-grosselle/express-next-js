@@ -9,10 +9,17 @@ const handle = app.getRequestHandler()
 app.prepare().then(() => {
   const server = express()
 
-  //Express middleware in error:
-  server.use('/favorites/a', (req, res, nextFunction) => {
-    nextFunction(500);
-  })
+  server.use('/favorites', (req, res, nextFunction) => {
+    if(req.path === "/") {
+      nextFunction(500);
+    } else {
+      nextFunction()
+    }
+  });
+
+  server.use('/favorites/throw-error', (req, res, nextFunction) => {
+    throw "ERROR";
+  });
 
   server.all('*', (req, res) => {
     return handle(req, res)
@@ -27,8 +34,8 @@ app.prepare().then(() => {
 })
 
 
-function errorHandler(err, req, res, next) {
-  console.log("ERROR HANDLER WITH ERROR", err);
-  res.status(err);
-  return app.render(req, res, '/_error', req.query);
+async function errorHandler(err, req, res, next) {
+  res.status(503);
+  const error = await app.renderToHTML(req, res, '/_error');
+  res.send(error);
 }
